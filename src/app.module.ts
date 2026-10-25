@@ -7,9 +7,10 @@ import { EmployeesModule } from './modules/employees/employees.module.js';
 import { IncidentsModule } from './modules/incidents/incidents.module.js';
 import { InspectionsModule } from './modules/inspections/inspections.module.js';
 import { ReportsModule } from './modules/reports/reports.module.js';
+import { UsuariosModule } from './modules/usuarios/usuarios.module.js';
 
 @Module({
-  imports: [AuthModule, UsersModule, EmployeesModule, IncidentsModule, InspectionsModule, ReportsModule],
+  imports: [AuthModule, UsersModule, EmployeesModule, IncidentsModule, InspectionsModule, ReportsModule, UsuariosModule],
   controllers: [AppController],
   providers: [AppService],
 })
