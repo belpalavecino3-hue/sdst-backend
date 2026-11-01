@@ -1,132 +1,84 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🌋 SDST - Sistema de Detección Sísmica Temprana | Backend API (NestJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API RESTful desarrollada en *NestJS* e integrada con una base de datos relacional *PostgreSQL* (sdst_db). Este servicio backend provee la arquitectura necesaria para alimentar la aplicación web de monitoreo sísmico de la provincia de Tucumán (SISO/SDST), gestionando la persistencia de usuarios, roles de seguridad, registros históricos de terremotos, red de hospitales de urgencia, entidades de emergencia y clasificación teórica de eventos sísmicos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Módulos y Servicios Principales
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+* *Autenticación y Seguridad (AuthModule / auth):* Gestión de inicio de sesión, verificación de credenciales y seguridad del sistema para controlar el acceso según el perfil de usuario.
+* *Gestión de Usuarios (UsersModule / users):* Administración de identidades del sistema con roles definidos (ADMIN, OPERADOR, CIUDADANO) para restringir las acciones dentro de la plataforma.
+* *Monitoreo de Sismos (TerremotosModule / terremotos):* Registro e historial de eventos sísmicos con datos de magnitud (Richter), profundidad, ubicación geolocalizada por estación y asignación de nivel de alerta (NORMAL, PRECAUCION, ALERTA ROJA, RIESGO).
+* *Red de Hospitales (HospitalesModule / hospitales):* Directorio de centros de salud y guardias de 24 hs en Tucumán, almacenando coordenadas geográficas, teléfonos de urgencia y especialidades médicas.
+* *Líneas de Emergencia (EmergenciasModule / emergencias):* Gestión de centrales de asistencia (107, 103, 911, 100, 108), coordinadas con usuarios operadores y vinculadas a reportes de eventos sísmicos.
+* *Tipos de Sismos (TiposSismosModule / tipos-sismos):* Clasificación teórica de fenómenos sísmicos (tectónicos, volcánicos, inducidos, profundos y detección de Ondas P primarias).
 
-## Project setup
+---
 
-```bash
-$ npm install
-```
+## 🛠️ Tecnologías y Librerías Utilizadas
 
-## Compile and run the project
+* *NestJS 11:* Framework progresivo de Node.js para la construcción de aplicaciones backend eficientes, escalables y estructuradas en TypeScript.
+* *TypeScript:* Lenguaje de programación tipado para garantizar robustez y mantenibilidad en el código.
+* *TypeORM:* Mapeador objeto-relacional (ORM) para la interacción declarativa con PostgreSQL mediante entidades y repositorios.
+* *PostgreSQL:* Sistema de gestión de base de datos relacional (RDBMS) utilizado para la persistencia de datos.
+* *pg (node-postgres):* Driver de conexión cliente para PostgreSQL.
+* *ConfigModule (@nestjs/config):* Gestión centralizada de variables de entorno mediante archivos .env.
 
-```bash
-# development
-$ npm run start
+---
 
-# watch mode
-$ npm run start:dev
+## 📂 Estructura del Proyecto
 
-# production mode
-$ npm run start:prod
-```
+```text
+sdst-backend/
+│
+├── src/
+│   ├── modules/                     # Módulos de la arquitectura NestJS
+│   │   ├── auth/                    # Autenticación, login y control de acceso
+│   │   │   ├── dto/                 # DTOs de autenticación
+│   │   │   ├── entities/            # Entidades de autenticación
+│   │   │   ├── auth.controller.ts   # Endpoints de autenticación
+│   │   │   ├── auth.module.ts       # Módulo central de auth
+│   │   │   └── auth.service.ts      # Lógica de negocio de auth
+│   │   │
+│   │   ├── users/                   # Gestión de usuarios del sistema
+│   │   │   ├── dto/                 # DTOs para creación y edición de usuarios
+│   │   │   ├── entities/            # Entidad de la tabla 'usuarios'
+│   │   │   ├── users.controller.ts  # Endpoints CRUD de usuarios
+│   │   │   ├── users.module.ts      # Módulo de usuarios
+│   │   │   └── users.service.ts     # Servicios de consulta e inserción
+│   │   │
+│   │   ├── terremotos/              # Eventos y lecturas sísmicas
+│   │   ├── hospitales/              # Módulo de centros de salud de Tucumán
+│   │   ├── emergencias/             # Directores telefónicos y centrales de asistencia
+│   │   └── tipos-sismos/            # Clasificación teórica y ondas sísmicas
+│   │
+│   ├── app.controller.ts            # Controlador raíz del sistema
+│   ├── app.module.ts                # Módulo raíz e importación de TypeORM
+│   ├── app.service.ts               # Servicio raíz
+│   └── main.ts                      # Punto de entrada de la aplicación NestJS
+│
+├── .env.example                    # Plantilla de variables de entorno requeridas
+├── .gitignore                      # Archivos excluidos del control de versiones (.env, node_modules, dist)
+├── package.json                    # Dependencias y scripts del proyecto NestJS
+├── tsconfig.json                   # Configuración del compilador de TypeScript
+└── README.md                       # Documentación del proyecto backend
 
-## Run tests
+🗄️ Modelo de Base de Datos (sdst_db)
+El sistema utiliza una base de datos PostgreSQL llamada sdst_db, compuesta por 5 tablas relacionales interconectadas mediante claves foráneas (FOREIGN KEY):
+usuarios: Almacena credenciales, correos institucionales/personales y roles (ADMIN, OPERADOR, CIUDADANO).
+tipos_sismos: Define los orígenes del sismo (Tectónicos, Volcánicos, Inducidos, Ondas P, Profundos).
+terremotos: Almacena lecturas con magnitud, profundidad, fecha, estación meteorológica/sísmica y relación al tipo de sismo.
+hospitales: Registra centros médicos, especialidades, teléfonos y coordenadas geográficas.
+emergencias: Centraliza números de ayuda vinculando relacionalmente sismos, hospitales y el usuario operador a cargo.
 
-```bash
-# unit tests
-$ npm run test
+⚙️ Instalación y Ejecución Local
 
-# e2e tests
-$ npm run test:e2e
+1. Clonar el repositorio: 
+  git clone [https://github.com/belpalavecino3-hue/sdst-backend.git](https://github.com/belpalavecino3-hue/sdst-backend.git)
+cd sdst-backend
 
-# test coverage
-$ npm run test:cov
-```
+2. Instalar dependencias:
+      npm install
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
-
-```bash
-$ npx @nestjs/observe link
-```
-
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
-
-Or do it by hand:
-
-```bash
-$ npm install @nestjs/observe
-```
-
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
-
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License 
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+3. Ejecutar el entorno de desarrollo:
+       npm run start:dev
