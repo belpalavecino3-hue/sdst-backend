@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateHospitaleDto } from './dto/create-hospitale.dto.js';
-import { UpdateHospitaleDto } from './dto/update-hospitale.dto.js';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateHospitalDto } from './dto/create-hospital.dto.js';
+import { UpdateHospitalDto } from './dto/update-hospital.dto.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class HospitalesService {
-  create(createHospitaleDto: CreateHospitaleDto) {
-    return 'This action adds a new hospitale';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(dto: CreateHospitalDto) {
+    return this.prisma.hospitales.create({ data: dto });
   }
 
-  findAll() {
-    return `This action returns all hospitales`;
+  async findAll() {
+    return this.prisma.hospitales.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hospitale`;
+  async findOne(id: number) {
+    const hospital = await this.prisma.hospitales.findUnique({ where: { id } });
+
+    if (!hospital) {
+      throw new NotFoundException(`No existe un hospital con id ${id}.`);
+    }
+
+    return hospital;
   }
 
-  update(id: number, updateHospitaleDto: UpdateHospitaleDto) {
-    return `This action updates a #${id} hospitale`;
+  async update(id: number, dto: UpdateHospitalDto) {
+    await this.findOne(id);
+
+    return this.prisma.hospitales.update({ where: { id }, data: dto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} hospitale`;
+  async remove(id: number) {
+    await this.findOne(id);
+
+    return this.prisma.hospitales.delete({ where: { id } });
   }
 }

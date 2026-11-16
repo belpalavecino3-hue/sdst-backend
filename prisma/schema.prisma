@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model usuarios {
+  id          Int           @id @default(autoincrement())
+  nombre      String        @db.VarChar(100)
+  email       String        @unique @db.VarChar(100)
+  password    String        @db.VarChar(255)
+  rol         String        @default("CIUDADANO") @db.VarChar(20)
+  creado_en   DateTime      @default(now()) @db.Timestamp(6)
+  emergencias emergencias[]
+}
+
+model hospitales {
+  id             Int           @id @default(autoincrement())
+  nombre         String        @db.VarChar(120)
+  direccion      String        @db.VarChar(150)
+  telefono       String        @db.VarChar(30)
+  especialidades String?       @db.VarChar(150)
+  coordenadas    String?       @db.VarChar(50)
+  guardia24hs   Boolean       @default(true)
+  emergencias    emergencias[]
+}
+
+model sismos {
+  id             Int          @id @default(autoincrement())
+  tipo           String       @unique @db.VarChar(50)
+  descripcion    String
+  magnitudMinima Decimal?     @db.Decimal(3, 1)
+  magnitudMaxima Decimal?     @db.Decimal(3, 1)
+  creado_en      DateTime     @default(now()) @db.Timestamp(6)
+  terremotos     terremotos[]
+}
+
+model niveles_alerta {
+  id              Int          @id @default(autoincrement())
+  nombre          String       @unique @db.VarChar(30)
+  color           String       @db.VarChar(20)
+  magnitud_minima Decimal      @db.Decimal(3, 1)
+  activar_sirena  Boolean      @default(false)
+  terremotos      terremotos[]
+}
+
+model estaciones_sismicas {
+  id          Int          @id @default(autoincrement())
+  codigo      String       @unique @db.VarChar(30)
+  ubicacion   String       @db.VarChar(150)
+  coordenadas String       @db.VarChar(50)
+  activa      Boolean      @default(true)
+  terremotos  terremotos[]
+}
+
+model terremotos {
+  id                  Int                  @id @default(autoincrement())
+  epicentro           String               @db.VarChar(150)
+  magnitud            Decimal              @db.Decimal(3, 1)
+  profundidad         Decimal              @db.Decimal(5, 2)
+  fechaHora           DateTime             @default(now()) @db.Timestamp(6)
+  estado              String?              @db.VarChar(50)
+  sismo_id            Int?
+  estacion_id         Int?
+  nivel_alerta_id     Int?
+  sismos              sismos?              @relation(fields: [sismo_id], references: [id], onUpdate: NoAction, map: "fk_sismo")
+  estaciones_sismicas estaciones_sismicas? @relation(fields: [estacion_id], references: [id], onUpdate: NoAction, map: "fk_estacion")
+  niveles_alerta      niveles_alerta?      @relation(fields: [nivel_alerta_id], references: [id], onUpdate: NoAction, map: "fk_nivel_alerta")
+  emergencias         emergencias[]
+}
+
+model emergencias {
+  id           Int         @id @default(autoincrement())
+  nombre       String      @db.VarChar(100)
+  numero       String      @db.VarChar(10)
+  descripcion  String
+  icono        String      @db.VarChar(50)
+  color        String      @db.VarChar(20)
+  gratuito     Boolean     @default(true)
+  terremoto_id Int?
+  hospital_id  Int?
+  usuario_id   Int?
+  hospitales   hospitales? @relation(fields: [hospital_id], references: [id], onUpdate: NoAction, map: "fk_hospital")
+  terremotos   terremotos? @relation(fields: [terremoto_id], references: [id], onUpdate: NoAction, map: "fk_terremoto")
+  usuarios     usuarios?   @relation(fields: [usuario_id], references: [id], onUpdate: NoAction, map: "fk_usuario")
+}
