@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTerremotoDto } from './dto/create-terremoto.dto.js';
 import { UpdateTerremotoDto } from './dto/update-terremoto.dto.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class TerremotosService {
-  create(createTerremotoDto: CreateTerremotoDto) {
-    return 'This action adds a new terremoto';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(dto: CreateTerremotoDto) {
+    return this.prisma.terremotos.create({ data: dto });
   }
 
-  findAll() {
-    return `This action returns all terremotos`;
+  async findAll() {
+    return this.prisma.terremotos.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} terremoto`;
+  async findOne(id: number) {
+    const terremoto = await this.prisma.terremotos.findUnique({ where: { id } });
+
+    if (!terremoto) {
+      throw new NotFoundException(`No existe un terremoto con id ${id}.`);
+    }
+
+    return terremoto;
   }
 
-  update(id: number, updateTerremotoDto: UpdateTerremotoDto) {
-    return `This action updates a #${id} terremoto`;
+  async update(id: number, dto: UpdateTerremotoDto) {
+    await this.findOne(id);
+
+    return this.prisma.terremotos.update({ where: { id }, data: dto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} terremoto`;
+  async remove(id: number) {
+    await this.findOne(id);
+
+    return this.prisma.terremotos.delete({ where: { id } });
   }
 }

@@ -1,9 +1,14 @@
 import { Injectable, NotImplementedException } from '@nestjs/common';
 import { LoginAuthDto } from './dto/login-auth.dto.js';
+import  * as bcrypt from 'bcrypt';
 import { RegisterAuthDto } from './dto/register-auth.dto.js';
+import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class AuthService {
+  constructor(private jwtService: JwtService) {}
+
   register(registerAuthDto: RegisterAuthDto): never {
     void registerAuthDto;
     throw new NotImplementedException(
