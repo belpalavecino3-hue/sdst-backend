@@ -1,25 +1,81 @@
-import { Injectable, NotImplementedException } from '@nestjs/common';
-import { LoginAuthDto } from './dto/login-auth.dto.js';
-import  * as bcrypt from 'bcrypt';
-import { RegisterAuthDto } from './dto/register-auth.dto.js';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
+import { PrismaService } from '../prisma/prisma.service.js';
+import { isPrismaUniqueConstraintError } from '../prisma/prisma-error.utils.js';
+import { LoginAuthDto } from './dto/login-auth.dto.js';
+import { RegisterAuthDto } from './dto/register-auth.dto.js';
+import { hashPassword, verifyPassword } from './password.util.js';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  register(registerAuthDto: RegisterAuthDto): never {
-    void registerAuthDto;
-    throw new NotImplementedException(
-      'Este es el método de registro, pero aan no se ha implementado la lógica de almacenamiento de usuarios en la base de datos.',
-    );
+  async register(registerAuthDto: RegisterAuthDto) {
+    const passwordHash = await hashPassword(registerAuthDto.password);
+
+    try {
+      const user = await this.prisma.usuarios.create({
+        data: {
+          nombre: registerAuthDto.nombre,
+          email: registerAuthDto.email,
+          password: passwordHash,
+          rol: registerAuthDto.rol,
+        },
+        select: {
+          id: true,
+          nombre: true,
+          email: true,
+          rol: true,
+          creado_en: true,
+        },
+      });
+
+      return user;
+    } catch (error) {
+      if (isPrismaUniqueConstraintError(error)) {
+        throw new ConflictException(
+          'Ya existe una cuenta con ese correo electrónico.',
+        );
+      }
+
+      throw error;
+    }
   }
 
-  login(loginAuthDto: LoginAuthDto): never {
-    void loginAuthDto;
-    throw new NotImplementedException(
-      'Este es el método de inicio de sesión, pero aún no se ha implementado la lógica de autenticación y generación de tokens.',
-    );
+  async login(loginAuthDto: LoginAuthDto) {
+    const user = await this.prisma.usuarios.findUnique({
+      where: { email: loginAuthDto.email },
+    });
+
+    if (
+      !user ||
+      !(await verifyPassword(loginAuthDto.password, user.password))
+    ) {
+      throw new UnauthorizedException('Correo o contraseña incorrectos.');
+    }
+
+    const accessToken = await this.jwtService.signAsync({
+      sub: user.id,
+      email: user.email,
+      rol: user.rol,
+    });
+
+    return {
+      access_token: accessToken,
+      user: {
+        id: user.id,
+        nombre: user.nombre,
+        email: user.email,
+        rol: user.rol,
+        creado_en: user.creado_en,
+      },
+    };
   }
 }
