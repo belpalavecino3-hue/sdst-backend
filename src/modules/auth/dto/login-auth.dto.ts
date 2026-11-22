@@ -2,6 +2,7 @@ import { IsEmail, IsNotEmpty, IsString, MaxLength, MinLength, } from 'class-vali
 
 export class LoginAuthDto {
   @IsEmail({}, { message: 'El correo electrónico debe tener un formato válido.' })
+   @MaxLength(100, { message: 'El correo electrónico no puede superar los 100 caracteres.' })
   email: string;
 
   @IsString({ message: 'La contraseña debe ser un texto.' })
